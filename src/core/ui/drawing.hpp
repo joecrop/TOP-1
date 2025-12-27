@@ -36,15 +36,15 @@ namespace top1::ui::drawing {
   }
 
   inline void initUtils(Canvas &canvas) {
-    Fonts::Light = Font(canvas, "TOP-1 Light", Fonts::font_dir / "TOP-1" / "TOP-1.ttf");
+    Fonts::Light = Font(canvas, "Otto Light", Fonts::font_dir / "Otto-Light.ttf");
     if (!Fonts::Light.valid()) {
       LOGE << "Invalid font: " << Fonts::Light.name;
     }
-    Fonts::Norm = Font(canvas, "TOP-1 Regular", Fonts::font_dir / "TOP-1" / "TOP-1.ttf");
+    Fonts::Norm = Font(canvas, "Otto Regular", Fonts::font_dir / "Otto-Regular.ttf");
     if (!Fonts::Norm.valid()) {
       LOGE << "Invalid font: " << Fonts::Norm.name;
     }
-    Fonts::Bold = Font(canvas, "TOP-1 Bold", Fonts::font_dir / "TOP-1" / "TOP-1.ttf");
+    Fonts::Bold = Font(canvas, "Otto Bold", Fonts::font_dir / "Otto-Bold.ttf");
     if (!Fonts::Bold.valid()) {
       LOGE << "Invalid font: " << Fonts::Bold.name;
     }

@@ -25,6 +25,9 @@ namespace top1::modules {
       Property<int, def, false> key        = {this, "KEY", 69, {0, 127, 1}};
       Property<float, def, false> velocity = {this, "VELOCITY", 1, {0, 1, 0.01}};
       Property<bool, def, false> trigger   = {this, "TRIGGER", false};
+      Property<float> filter               = {this, "FILTER", 1, {10, 15000, 10}};
+      Property<float> detune               = {this, "DETUNE", 0, {0, 1, 0.01}};
+      Property<float> voices               = {this, "VOICES", 1, {1, 4, 0.01}};
     } props;
 
     NukeSynth();
