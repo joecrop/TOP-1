@@ -1,5 +1,6 @@
 #pragma once
 
+#include "util/cpp17_compat.hpp"
 #include <type_traits>
 #include <variant>
 #include <iterator>

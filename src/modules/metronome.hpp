@@ -21,9 +21,9 @@ namespace top1::modules {
 
   public:
     struct Props : public modules::Properties {
-      Property<float> bpm     = {this, "BPM", 120, {40, 320, 1}};
-      Property<float> gain    = {this, "GAIN", 0, {0, 1, 0.01}};
-      Property<int>   tone    = {this, "TONE", 12, {0, 24, 1}};
+      Property<float> bpm     = {this, "BPM", 120, mode::sized_step_mode<float>(40, 320, 1)};
+      Property<float> gain    = {this, "GAIN", 0, mode::sized_step_mode<float>(0, 1, 0.01)};
+      Property<int>   tone    = {this, "TONE", 12, mode::sized_step_mode<int>(0, 24, 1)};
       Property<bool, mode::def,
         false> trigger = {this, "TRIGGER", false};
     } props;

@@ -72,7 +72,7 @@ namespace top1::modules {
     } state;
 
     struct Props : Properties {
-      Property<float> gain = {this, "PROC_GAIN", 0.5, {0, 1, 0.01}};
+      Property<float> gain = {this, "PROC_GAIN", 0.5, mode::sized_step_mode<float>(0, 1, 0.01)};
     } props;
 
     audio::Graph procGraph;

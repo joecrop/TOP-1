@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <optional>
 // TODO: Use c++17 std::variant
 // NOTE: Might be hard due to recursion
 #include <mapbox/variant.hpp>
@@ -138,7 +139,11 @@ namespace top1::tree {
 
   // Specialize for things
   template<typename T>
-  inline std::optional<T> readNode(Node);
+  inline std::optional<T> readNode(Node) {
+    // Default implementation returns empty optional
+    // Specialize for specific types below
+    return std::nullopt;
+  }
 
   // Default specializations
 

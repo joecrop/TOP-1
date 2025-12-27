@@ -129,7 +129,7 @@ namespace top1 {
     };
 
     using Position = int;
-    using Path = filesystem::path;
+    using Path = fs::path;
 
     struct Chunk {
       bytes<4> id;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "util/cpp17_compat.hpp"
 #include <algorithm>
 #include <initializer_list>
 #include <functional>
@@ -10,7 +11,7 @@ namespace top1 {
 
   /// Joins a sequence of strings, separating them using `js`
   template<class StrIterator> // Models InputIterator<std::string>
-  auto join_strings(StrIterator b, StrIterator e, std::string_view js = ", ") -> std::string {
+  auto join_strings(StrIterator b, StrIterator e, const std::string& js = ", ") -> std::string {
     std::string result;
     std::for_each(b, e, [&] (auto&& s) {
         if (!result.empty()) {

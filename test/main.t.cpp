@@ -4,7 +4,7 @@
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 
-namespace fs = std::experimental::filesystem;
+using namespace top1;
 
 int main( int argc, char* argv[] )
 {

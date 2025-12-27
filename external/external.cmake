@@ -5,9 +5,15 @@ file(GLOB_RECURSE external_src
   "${CMAKE_CURRENT_SOURCE_DIR}/external/src/*.c"
   "${CMAKE_CURRENT_SOURCE_DIR}/external/src/*.cpp"
 )
-add_library(external ${external_src})
-target_include_directories(external PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/include)
-set_target_properties(external PROPERTIES LINKER_LANGUAGE CXX)
+if(external_src)
+  add_library(external ${external_src})
+  target_include_directories(external PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/include)
+  set_target_properties(external PROPERTIES LINKER_LANGUAGE CXX)
+else()
+  # Create an interface library if no sources found
+  add_library(external INTERFACE)
+  target_include_directories(external INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/external/include)
+endif()
 
 # Nanovg
 execute_process(COMMAND git submodule update --init -- external/nanovg

@@ -26,7 +26,7 @@ namespace top1 {
     static inline std::atomic_bool isRunning {true};
   public:
 
-    static inline const filesystem::path data_dir {"data"};
+    static inline const fs::path data_dir {"data"};
     static inline std::condition_variable notifyExit;
 
     static inline struct {

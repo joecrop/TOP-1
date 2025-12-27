@@ -1,4 +1,5 @@
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 file(GLOB_RECURSE headers ${TOP-1_SOURCE_DIR}/src/*.hpp)
 file(GLOB_RECURSE sources ${TOP-1_SOURCE_DIR}/src/*.cpp)
@@ -7,6 +8,7 @@ list(REMOVE_ITEM sources ${TOP-1_SOURCE_DIR}/src/main.cpp)
 find_package (Threads)
 # Library
 add_library(top-1 ${sources})
+target_compile_features(top-1 PUBLIC cxx_std_17)
 target_link_libraries(top-1 PUBLIC external)
 target_link_libraries(top-1 PUBLIC nanocanvas)
 target_link_libraries(top-1 PUBLIC GSL)
