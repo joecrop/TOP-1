@@ -26,13 +26,15 @@ namespace top1::audio {
   void JackAudio::init() {
     client = jack_client_open(clientName.c_str(), JackNullOption, &jackStatus);
 
-    if ((!jackStatus) & JackServerStarted) {
-      LOGF << "Failed to start jack server";
+    if (client == nullptr) {
+      LOGF << "Failed to open JACK client (status: " << jackStatus << ")";
       Globals::exit();
       return;
     }
 
-    LOGI << "Jack server started";
+    if (jackStatus & JackServerStarted) {
+      LOGI << "Jack server started";
+    }
     LOGD << "Jack client status: " << jackStatus;
 
     jack_set_process_callback(client,
@@ -117,9 +119,7 @@ namespace top1::audio {
     auto outputs = findPorts(JackPortIsPhysical | JackPortIsInput);
 
     if (inputs.empty()) {
-      LOGF << "Couldn't find physical input port";
-      Globals::exit();
-      return;
+      LOGW << "Couldn't find physical input port - running without audio input";
     }
     if (outputs.empty()) {
       LOGF << "Couldn't find physical output ports";
@@ -129,8 +129,10 @@ namespace top1::audio {
 
     bool s;
 
-    s = connectPorts(jack_port_name(ports.input), inputs[0]);
-    if (!s) {Globals::exit(); return;}
+    if (!inputs.empty()) {
+      s = connectPorts(jack_port_name(ports.input), inputs[0]);
+      if (!s) {LOGW << "Failed to connect input port"; }
+    }
 
     s = connectPorts(outputs[0 % outputs.size()], jack_port_name(ports.outL));
     if (!s) {Globals::exit(); return;}
