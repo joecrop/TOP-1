@@ -46,6 +46,10 @@ file(GLOB imgui_src
   )
 add_library(imgui ${imgui_src})
 target_include_directories(imgui INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
+# Disable class-memaccess warnings for older ImGui code
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(imgui PRIVATE -Wno-class-memaccess)
+endif()
 
 # fmtlib
 execute_process(COMMAND git submodule update --init -- fmt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})

@@ -1,153 +1,6 @@
 {
   "Drums": {
-    "Drum Sampler": {
-      "Voice 0": {
-        "in": 0,
-        "mode": 0,
-        "out": 22244,
-        "pitch": 0.0
-      },
-      "Voice 1": {
-        "in": 22244,
-        "mode": 0,
-        "out": 51815,
-        "pitch": 0.0
-      },
-      "Voice 10": {
-        "in": 345312,
-        "mode": 0,
-        "out": 461514,
-        "pitch": 0.0
-      },
-      "Voice 11": {
-        "in": 461514,
-        "mode": 0,
-        "out": 697463,
-        "pitch": 0.0
-      },
-      "Voice 12": {
-        "in": 1,
-        "mode": 0,
-        "out": 22244,
-        "pitch": 0.0
-      },
-      "Voice 13": {
-        "in": 22244,
-        "mode": 0,
-        "out": 51815,
-        "pitch": 0.0
-      },
-      "Voice 14": {
-        "in": 51815,
-        "mode": 0,
-        "out": 81439,
-        "pitch": 0.0
-      },
-      "Voice 15": {
-        "in": 81439,
-        "mode": 0,
-        "out": 107162,
-        "pitch": 0.0
-      },
-      "Voice 16": {
-        "in": 107162,
-        "mode": 0,
-        "out": 119100,
-        "pitch": 0.0
-      },
-      "Voice 17": {
-        "in": 119100,
-        "mode": 0,
-        "out": 138736,
-        "pitch": 0.0
-      },
-      "Voice 18": {
-        "in": 138736,
-        "mode": 0,
-        "out": 157554,
-        "pitch": 0.0
-      },
-      "Voice 19": {
-        "in": 157554,
-        "mode": 0,
-        "out": 181380,
-        "pitch": 0.0
-      },
-      "Voice 2": {
-        "in": 51815,
-        "mode": 0,
-        "out": 81439,
-        "pitch": 0.0
-      },
-      "Voice 20": {
-        "in": 181380,
-        "mode": 0,
-        "out": 219437,
-        "pitch": 0.0
-      },
-      "Voice 21": {
-        "in": 219437,
-        "mode": 0,
-        "out": 345312,
-        "pitch": 0.0
-      },
-      "Voice 22": {
-        "in": 345312,
-        "mode": -1,
-        "out": 461514,
-        "pitch": 0.0
-      },
-      "Voice 23": {
-        "in": 461514,
-        "mode": 2,
-        "out": 697463,
-        "pitch": 0.0
-      },
-      "Voice 3": {
-        "in": 81439,
-        "mode": 0,
-        "out": 107162,
-        "pitch": 0.0
-      },
-      "Voice 4": {
-        "in": 107162,
-        "mode": 0,
-        "out": 119100,
-        "pitch": 0.0
-      },
-      "Voice 5": {
-        "in": 119100,
-        "mode": 0,
-        "out": 138736,
-        "pitch": 0.0
-      },
-      "Voice 6": {
-        "in": 138736,
-        "mode": 0,
-        "out": 157554,
-        "pitch": 0.0
-      },
-      "Voice 7": {
-        "in": 157554,
-        "mode": 2,
-        "out": 181380,
-        "pitch": 0.0
-      },
-      "Voice 8": {
-        "in": 181380,
-        "mode": -1,
-        "out": 219437,
-        "pitch": 0.0
-      },
-      "Voice 9": {
-        "in": 219437,
-        "mode": 2,
-        "out": 345312,
-        "pitch": 0.0
-      },
-      "sample name": "samplepack"
-    },
-    "Simple drums": [
+    "Additive Drums": [
       {
         "D1": {
           "CUTOFF": 7000.0,
@@ -652,7 +505,154 @@
           "SUSTAIN": 1.0
         }
       }
-    ]
+    ],
+    "Sampler": {
+      "Voice 0": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 1": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 10": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 11": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 12": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 13": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 14": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 15": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 16": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 17": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 18": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 19": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 2": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 20": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 21": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 22": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 23": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 3": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 4": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 5": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 6": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 7": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 8": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "Voice 9": {
+        "in": 0,
+        "mode": 0,
+        "out": 0,
+        "speed": 1.0
+      },
+      "sample name": ""
+    }
   },
   "Metronome": {
     "BPM": 120.0,
@@ -682,20 +682,145 @@
     }
   },
   "Synth": {
+    "Cluster": {
+      "ATTACK": 0.00999999977648258,
+      "DENSITY": 0.5,
+      "GRAIN_SIZE": 0.0500000007450581,
+      "PITCH": 0.0,
+      "RELEASE": 0.300000011920929,
+      "SPREAD": 0.300000011920929
+    },
+    "DNA": {
+      "ATTACK": 0.00999999977648258,
+      "DECAY": 0.300000011920929,
+      "MORPH": 0.5,
+      "MUTATE": 0.0,
+      "RELEASE": 0.300000011920929,
+      "SUSTAIN": 0.699999988079071,
+      "TABLE_A": 1,
+      "TABLE_B": 2
+    },
+    "Digital": {
+      "ATTACK": 0.00999999977648258,
+      "BRIGHTNESS": 0.5,
+      "DECAY": 0.300000011920929,
+      "DETUNE": 0.0,
+      "HARMONICS": 8,
+      "RELEASE": 0.300000011920929,
+      "SUSTAIN": 0.699999988079071
+    },
+    "FM": {
+      "ALGORITHM": 1,
+      "ATTACK": 0.00999999977648258,
+      "DECAY": 0.100000001490116,
+      "MOD INDEX": 2.0,
+      "OP1 LEVEL": 0.800000011920929,
+      "OP1 RATIO": 1.0,
+      "OP2 LEVEL": 0.600000023841858,
+      "OP2 RATIO": 2.0,
+      "OP3 LEVEL": 0.400000005960464,
+      "OP3 RATIO": 3.0,
+      "OP4 LEVEL": 0.300000011920929,
+      "OP4 RATIO": 4.0,
+      "RELEASE": 0.300000011920929,
+      "SUSTAIN": 0.699999988079071
+    },
     "Nuke": {
+      "DETUNE": 0.0,
       "ENVELOPE": {
         "ATTACK": 0.0,
         "DECAY": 0.0,
         "RELEASE": 0.200000002980232,
         "SUSTAIN": 1.0
-      }
+      },
+      "FILTER": 1.0,
+      "VOICES": 1.0
+    },
+    "Phase": {
+      "ATTACK": 0.00999999977648258,
+      "BRIGHTNESS": 0.5,
+      "DECAY": 0.300000011920929,
+      "FEEDBACK": 0.0,
+      "INDEX": 1.0,
+      "RELEASE": 0.300000011920929,
+      "RESONANCE": 1.0,
+      "SUSTAIN": 0.699999988079071
+    },
+    "Pulse": {
+      "ATTACK": 0.00999999977648258,
+      "CUTOFF": 1.0,
+      "DECAY": 0.300000011920929,
+      "DETUNE": 0.0,
+      "FILTER ENV": 0.5,
+      "GLIDE": 0.0,
+      "LFO DEPTH": 0.0,
+      "LFO RATE": 2.0,
+      "OCTAVE": 0,
+      "PULSE WIDTH": 0.5,
+      "RELEASE": 0.5,
+      "RESONANCE": 0.0,
+      "SUSTAIN": 0.699999988079071
+    },
+    "Sampler": {
+      "in": 0,
+      "mode": 0,
+      "out": 0,
+      "rootKey": 60,
+      "sample name": "",
+      "speed": 1.0
+    },
+    "String": {
+      "ATTACK": 0.00999999977648258,
+      "BRIGHTNESS": 0.5,
+      "DAMPING": 0.300000011920929,
+      "DECAY": 0.300000011920929,
+      "PICK POS": 0.200000002980232,
+      "TENSION": 0.5
+    },
+    "Super Saw": {
+      "DETUNE": 0.0,
+      "ENVELOPE": {
+        "ATTACK": 0.0,
+        "DECAY": 0.0,
+        "RELEASE": 0.200000002980232,
+        "SUSTAIN": 1.0
+      },
+      "FILTER": 1.0,
+      "VOICES": 1.0
+    },
+    "Vocoder": {
+      "ATTACK": 0.00999999977648258,
+      "BANDWIDTH": 0.5,
+      "CARRIER": 1.0,
+      "FORMANT": 2,
+      "MODULATOR": 1.0,
+      "RELEASE": 0.200000002980232
+    },
+    "Voltage": {
+      "ATTACK": 0.00999999977648258,
+      "CUTOFF": 0.5,
+      "DECAY": 0.300000011920929,
+      "ENV_AMOUNT": 0.5,
+      "RELEASE": 0.300000011920929,
+      "RESONANCE": 0.300000011920929,
+      "SUSTAIN": 0.699999988079071,
+      "WAVEFORM": 1
+    },
+    "Wavetable": {
+      "ATTACK": 0.00999999977648258,
+      "CUTOFF": 1.0,
+      "DECAY": 0.200000002980232,
+      "DETUNE": 0.0,
+      "MORPH": 0.0,
+      "OCTAVE": 0,
+      "POSITION": 0.0,
+      "RELEASE": 0.300000011920929,
+      "RESONANCE": 0.200000002980232,
+      "SUSTAIN": 0.699999988079071,
+      "WAVEFORM": 1
     }
   },
   "TapeDeck": {
-    "PROC_GAIN": 0.5,
-    "Tape Speed": 1.0
-  },
-  "UI": {
-    "SelectedEngine": ""
+    "PROC_GAIN": 0.5
   }
 }
