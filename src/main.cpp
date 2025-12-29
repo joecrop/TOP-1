@@ -47,20 +47,20 @@ int main(int argc, char *argv[]) {
     LOGF << e;
     LOGI << "Exitting";
     Globals::events.preExit.runAll();
+    Globals::jackAudio.exit();  // Stop audio processing first
     Globals::ui.exit();
     Globals::mixer.exit();
     Globals::tapedeck.exit();
-    Globals::jackAudio.exit();
     Globals::dataFile.write();
     Globals::events.postExit.runAll();
   }
 
   LOGI << "Exitting";
   Globals::events.preExit.runAll();
+  Globals::jackAudio.exit();  // Stop audio processing first
   Globals::ui.exit();
   Globals::mixer.exit();
   Globals::tapedeck.exit();
-  Globals::jackAudio.exit();
   Globals::dataFile.write();
   Globals::events.postExit.runAll();
   return 0;

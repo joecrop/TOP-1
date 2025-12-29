@@ -81,9 +81,13 @@ namespace top1::audio {
   }
 
   void JackAudio::exit() {
+    isProcessing = false;  // Stop processing callback from doing work
     LOGI << "Closing Jack client";
-    jack_client_close(client);
-    Globals::exit();
+    if (client) {
+      jack_deactivate(client);  // Deactivate first to ensure callbacks stop
+      jack_client_close(client);
+      client = nullptr;
+    }
   }
 
   void JackAudio::samplerateCallback(uint srate) {

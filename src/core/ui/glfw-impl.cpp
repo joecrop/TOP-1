@@ -216,11 +216,21 @@ namespace top1::ui {
 
       }
 
+    // Signal exit before cleanup so main thread can start shutdown
+    Globals::exit();
+
+    // Clean up NanoVG while context is still current
     nvgDeleteGLES3(vg);
 
-    glfwTerminate();
-
-    Globals::exit();
+    // Clean up OpenGL context 
+    glfwMakeContextCurrent(nullptr);
+    
+    glfwDestroyWindow(window);
+    
+    // Note: glfwTerminate() is intentionally not called here because
+    // MESA's OpenGL ES implementation has thread-local storage issues
+    // that cause crashes when glfwTerminate is called from a non-main thread.
+    // The OS will clean up resources when the process exits.
   }
 
 } // top1::ui
