@@ -37,6 +37,7 @@ namespace top1::modules {
       Property<int> out        = {this, "out",   0, { 0, -1, 100}};
       Property<float> speed    = {this, "speed", 1, { 0,  5, 0.01}};
       Property<int, wrap> mode = {this, "mode",  0, {-3,  2, 1}};
+      Property<int> rootKey    = {this, "rootKey", 60}; // C4 (middle C)
 
       bool fwd() const {return mode >= 0;}
       bool bwd() const {return !fwd();}

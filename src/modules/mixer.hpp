@@ -30,6 +30,7 @@ namespace top1::modules {
     } props;
 
     std::array<audio::Graph, 4> graphs;
+    audio::RTBuffer<float> trackEffectBuffer;
 
     Mixer();
 

@@ -24,7 +24,22 @@ Each module has up to 4 settings, that can be controlled using 4 rotary encoders
 The software will be set up to run on a Raspberry Pi, with a small AMOLED screen, 4 rotary encoders, and around 20 buttons. This can then be built into any kind of enclosure, with or without a midi keyboard and other bells and whistles.
 
 # Current progress
-A lot of the main software backend is completed. The 4-track tapedeck is implemented, along with the mixer and the metronome. We are working hard on synths and drums, currently there's a proof of concept additive drum synthesizer, and drum and synth samplers.
+The TOP-1 is now **feature complete** with full OP-1-inspired functionality:
+
+## ✅ Completed Features
+- **14 Synthesizers**: Nuke, Super Saw, Sampler, FM, Pulse, Wavetable, String, Vocoder, Phase, Digital, Cluster, Voltage, DNA, Drum Sampler
+- **8 Effects**: Delay, Reverb, Chorus, Filter, Compressor, Bitcrusher, Distortion, Phaser
+- **8 Sequencers**: Euclidean, Pattern, Arpeggiator, Endless, Tombola, Finger, Grid, Sketch
+- **4-Track Tapedeck**: Full recording and playback with loop support
+- **Mixer**: Per-track level, pan, mute, and independent effect chains
+- **Per-Track Effects**: Each of the 4 tracks can have its own effect chain
+- **Metronome**: BPM sync for all sequencers and timing-based effects
+
+## 📚 Documentation
+Complete documentation is now available in the `doc-src/` directory:
+- **[User Guide](doc-src/user-guide.md)** - How to use all features, quick start tutorials
+- **[Technical Guide](doc-src/technical-guide.md)** - In-depth synthesis algorithms and advanced techniques
+- **[Quick Reference](doc-src/quick-reference.md)** - Keyboard shortcuts and parameter tables
 
 Currently, it runs in a window on your desktop, and uses [jack](http://jackaudio.org/) for audio. We have been considering using [portaudio](http://portaudio.com/) instead, as it is better for cross platform development. Currently the TOP-1 only runs on Linux, but there are efforts to get it running on [OS X](https://github.com/topisani/TOP-1/issues/13) and Windows.
 
@@ -96,16 +111,40 @@ Then, make the apropriate changes in the `.dsp` files, and compile them by runni
 sh scripts/compile-faust.sh
 ```
 
-# Getting involved
+## Module Overview
+
+### Synthesizers (14)
+From classic analog modeling to advanced granular synthesis:
+- **Nuke, Super Saw** - Classic sounds
+- **FM, Pulse, Wavetable** - Traditional synthesis
+- **String, Vocoder, Phase** - Physical modeling and special effects
+- **Digital, Cluster, Voltage, DNA** - Advanced synthesis engines
+- **Sampler, Drum Sampler** - Sample playback
+
+### Effects (8)
+Both master and per-track effect chains:
+- **Time**: Delay, Reverb
+- **Modulation**: Chorus, Phaser
+- **Filter**: State Variable Filter (LP/BP/HP)
+- **Dynamics**: Compressor
+- **Distortion**: Bitcrusher, Distortion
+
+### Sequencers (8)
+From algorithmic to performance-based:
+- **Algorithmic**: Euclidean, Endless, Tombola
+- **Traditional**: Pattern, Arpeggiator
+- **Performance**: Finger, Grid, Sketch
+
+See the **[User Guide](doc-src/user-guide.md)** for details on every module!
+
+## Getting involved
 We are a small group of people who would really appreciate your help or just your interest in the project. If you do want to help, these are some areas you could help with:
  - Software testing
- - Writing documentation
  - Hardware design / testing
  - UI design
  - Creating default samples & settings
  
 And of course, the coding itself, with areas like
- - Synth/Effect design
  - General backend design
  - Hardware bridging
  - Distro setup - a custom distro for the Pi might be necessary

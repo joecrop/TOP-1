@@ -24,6 +24,27 @@ namespace top1::modules {
     auto &trackBuffer = Globals::tapedeck.trackBuffer;
     auto level = generate_sequence<4>([this] (int n) { return props.tracks[n].level.get(); });
     auto pan = generate_sequence<4>([this] (int n) { return props.tracks[n].pan.get(); });
+    
+    // Process per-track effects
+    audio::ProcessData trackData = data;
+    trackData.audio.proc = {trackEffectBuffer.data(), data.nframes};
+    
+    for (uint t = 0; t < 4; t++) {
+      // Copy track to effect buffer
+      for (uint f = 0; f < data.nframes; f++) {
+        trackEffectBuffer[f] = trackBuffer[f][t];
+      }
+      
+      // Process track effect
+      Globals::trackEffects[t].process(trackData);
+      
+      // Copy back to track buffer
+      for (uint f = 0; f < data.nframes; f++) {
+        trackBuffer[f][t] = trackEffectBuffer[f];
+      }
+    }
+    
+    // Mix tracks
     for (uint f = 0; f < data.nframes; f++) {
       float lMix = 0, rMix = 0;
       for (uint t = 0; t < 4 ; t++) {

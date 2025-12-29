@@ -46,7 +46,9 @@ namespace top1 {
 
     static inline modules::SynthModuleDispatcher synth;
     static inline modules::SynthModuleDispatcher drums;
+    static inline modules::SequencerModuleDispatcher sequencer;
     static inline modules::EffectModuleDispatcher effect;
+    static inline std::array<modules::EffectModuleDispatcher, 4> trackEffects;
     static inline modules::Tapedeck tapedeck;
     static inline modules::Mixer mixer;
     static inline modules::Metronome metronome;
@@ -59,6 +61,7 @@ namespace top1 {
       mixer.init();
       synth.current().init();
       drums.current().init();
+      sequencer.current().init();
       ui.init();
     }
 

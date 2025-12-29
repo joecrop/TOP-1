@@ -251,6 +251,7 @@ namespace top1::audio {
       }
     }
 
+    Globals::sequencer.process(processData);
     Globals::tapedeck.preProcess(processData);
     Globals::synth.process(processData);
     Globals::drums.process(processData);

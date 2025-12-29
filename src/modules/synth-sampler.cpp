@@ -37,6 +37,10 @@ namespace top1::modules {
           if (e.channel == 0) {
             props.playProgress = (props.fwd()) ? 0 : props.length() - 1;
             props.trigger = true;
+            // Calculate pitch ratio based on root key
+            int semitoneOffset = e.key - props.rootKey;
+            float pitchRatio = std::pow(2.0f, semitoneOffset / 12.0f);
+            props.speed = pitchRatio; // Modulate speed by pitch
           }
         }, [] (auto) {});
     }
@@ -242,6 +246,13 @@ namespace top1::modules {
     ctx.font(15);
     ctx.textAlign(TextAlign::Left, TextAlign::Baseline);
     ctx.fillText(fmt::format("×{:.2F}", props.speed.get()), pitchPos);
+    
+    // Display root key
+    const char* noteNames[] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+    int rootNote = props.rootKey % 12;
+    int rootOctave = (props.rootKey / 12) - 1;
+    ctx.fillStyle(Colours::Blue);
+    ctx.fillText(fmt::format("Root: {}{}", noteNames[rootNote], rootOctave), {20, 20});
 
     ctx.callAt(
       mainWFpos, [&] () {
