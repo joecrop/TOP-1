@@ -191,15 +191,16 @@ namespace top1::modules {
     float cellH = 9;  // Reduced from 14 to 9 (5 pixels less)
     float spacing = 1;
 
-    // Draw note labels on left
+    // Draw note labels on left (reversed - high notes on top)
     ctx.font(Fonts::Norm);
     ctx.font(8);
     ctx.textAlign(TextAlign::Right, TextAlign::Middle);
     for (int n = 0; n < PatternSequencer::NUM_NOTES; n++) {
+      int displayRow = PatternSequencer::NUM_NOTES - 1 - n;  // Reverse: slot 15 at top, slot 0 at bottom
       int midiNote = module->getNoteForSlot(n);
       std::string noteName = midi::noteName(midiNote);
       ctx.fillStyle(Colours::Gray60);
-      ctx.fillText(noteName, gridX - 3, gridY + n * (cellH + spacing) + cellH / 2);
+      ctx.fillText(noteName, gridX - 3, gridY + displayRow * (cellH + spacing) + cellH / 2);
     }
 
     // Draw cursor column highlight (full column)
@@ -214,11 +215,12 @@ namespace top1::modules {
     ctx.lineWidth(2);
     ctx.stroke();
 
-    // Draw grid cells
+    // Draw grid cells (reversed - high notes on top)
     for (int step = 0; step < PatternSequencer::NUM_STEPS; step++) {
       for (int note = 0; note < PatternSequencer::NUM_NOTES; note++) {
+        int displayRow = PatternSequencer::NUM_NOTES - 1 - note;  // Reverse: slot 15 at top, slot 0 at bottom
         float x = gridX + step * (cellW + spacing);
-        float y = gridY + note * (cellH + spacing);
+        float y = gridY + displayRow * (cellH + spacing);
         
         // Dim steps beyond pattern length
         bool inPattern = step < patternLength;

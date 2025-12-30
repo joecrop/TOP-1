@@ -24,21 +24,19 @@ namespace top1::midi {
   };
 
   struct NoteOnEvent : public MidiEvent {
-    int key = data[0];
-    int velocity = data[1];
+    int key;
+    int velocity;
 
-    NoteOnEvent(const MidiEvent& event) : MidiEvent(event) {};
+    NoteOnEvent(const MidiEvent& event) : MidiEvent(event), key(data[0]), velocity(data[1]) {};
     
     // Constructor for programmatic creation (e.g., from sequencer)
-    NoteOnEvent(int note, int vel) {
+    NoteOnEvent(int note, int vel) : key(note), velocity(vel) {
       type = NOTE_ON;
       channel = 0;
       eventData[0] = note;
       eventData[1] = vel;
       data = eventData;
       time = 0;
-      key = note;
-      velocity = vel;
     }
   private:
     byte eventData[2];  // Storage for programmatically created events
