@@ -17,6 +17,7 @@
 #include "modules/tapedeck.hpp"
 #include "modules/mixer.hpp"
 #include "modules/metronome.hpp"
+#include "modules/lfo.hpp"
 
 
 namespace top1 {
@@ -46,7 +47,10 @@ namespace top1 {
 
     static inline modules::SynthModuleDispatcher synth;
     static inline modules::SynthModuleDispatcher drums;
-    static inline modules::EffectModuleDispatcher effect;
+    static inline modules::EffectModuleDispatcher effect;  // Master effect
+    static inline std::array<modules::EffectModuleDispatcher, 4> trackEffects;  // Per-track effects
+    static inline modules::SequencerModuleDispatcher sequencer;  // Sequencer
+    static inline std::array<modules::LFO, 2> lfos;  // Two LFOs for modulation
     static inline modules::Tapedeck tapedeck;
     static inline modules::Mixer mixer;
     static inline modules::Metronome metronome;

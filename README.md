@@ -24,7 +24,44 @@ Each module has up to 4 settings, that can be controlled using 4 rotary encoders
 The software will be set up to run on a Raspberry Pi, with a small AMOLED screen, 4 rotary encoders, and around 20 buttons. This can then be built into any kind of enclosure, with or without a midi keyboard and other bells and whistles.
 
 # Current progress
-A lot of the main software backend is completed. The 4-track tapedeck is implemented, along with the mixer and the metronome. We are working hard on synths and drums, currently there's a proof of concept additive drum synthesizer, and drum and synth samplers.
+A lot of the main software backend is completed. The 4-track tapedeck is implemented, along with the mixer and the metronome. The TOP-1 now features a comprehensive suite of synths, effects, and sequencers inspired by the OP-1.
+
+## Available Modules
+
+### Synths (10 engines)
+- **Nuke** - Additive synthesis
+- **Super Saw** - Detuned sawtooth waves for fat pads and leads
+- **Sampler** - Sample-based synthesis with pitch control
+- **FM** - 2-operator FM synthesis with ratio and modulation depth
+- **Pulse** - Pulse wave with PWM modulation
+- **Wavetable** - Morphable wavetable synthesis
+- **String** - Karplus-Strong physical modeling
+- **Cluster** - Granular synthesis with spray and texture control
+- **Digital** - Lo-fi bitcrushed synthesis with glitch
+- **Phase** - Phase distortion (CZ-style) synthesis
+
+### Effects (9 types)
+- **Delay** - Tempo-synced delay with feedback and filtering
+- **Reverb** - Algorithmic reverb with size and damping
+- **Chorus** - Stereo chorus with rate and depth
+- **Filter** - Multi-mode filter (LP/HP/BP)
+- **Drive** - Saturation and distortion
+- **Phaser** - Classic phaser effect
+- **CWO** - Tape wow and flutter effect
+- **Nitro** - Compressor/boost with visualization
+- **Spring** - Spring reverb simulation
+
+### Sequencers (3 types)
+- **Pattern** - 16-step × 8-note grid sequencer
+- **Arpeggiator** - Classic arpeggiator with multiple modes
+- **Endless** - Generative/algorithmic sequencer
+
+### Additional Features
+- **Per-track effects** - Each of the 4 tracks has its own effect slot
+- **LFO modulation** - 2 global LFOs with multiple waveforms
+- **Tape speed control** - Varispeed for pitch/tempo manipulation
+
+For detailed usage instructions, see [doc-src/modules.md](doc-src/modules.md).
 
 Currently, it runs in a window on your desktop, and uses [jack](http://jackaudio.org/) for audio. We have been considering using [portaudio](http://portaudio.com/) instead, as it is better for cross platform development. Currently the TOP-1 only runs on Linux, but there are efforts to get it running on [OS X](https://github.com/topisani/TOP-1/issues/13) and Windows.
 
@@ -44,7 +81,8 @@ These are the key bindings currently emulating the hardware buttons:
 | F1          | Track 1             | F2                  | Track 2             |
 | F3          | Track 3             | F4                  | Track 4             |
 | Ctrl + T    | Tape                | Ctrl + Y            | Mixer               |
-| Ctrl + U    | Synth               | Ctrl + G            | Metronome           |
+| Ctrl + U    | Synth               | Ctrl + I            | Effect              |
+| Ctrl + O    | Sequencer           | Ctrl + G            | Metronome           |
 | I           | Go to Loop In       | Shift + I           | Set Loop In         |
 | O           | Go to Loop Out      | Shift + O           | Set Loop Out        |
 | L           | Toggle Looping      | Ctrl + X            | Cut Tape Selection  |

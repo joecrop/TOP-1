@@ -88,6 +88,12 @@ namespace top1::ui {
     case K_DRUMS:
       Globals::drums.display();
       break;
+    case K_EFFECT:
+      Globals::effect.display();
+      break;
+    case K_SEQUENCER:
+      Globals::sequencer.display();
+      break;
     case K_METRONOME:
       Globals::metronome.display();
       break;

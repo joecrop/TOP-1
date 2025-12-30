@@ -14,6 +14,7 @@ namespace top1::modules {
     SynthModule(&props),
     maxSampleSize (16 * Globals::samplerate),
     sampleData (maxSampleSize),
+    recordBuffer (maxSampleSize),
     editScreen (new SynthSampleScreen(this)) {
 
     Globals::events.samplerateChanged.add([&] (uint sr) {
@@ -32,23 +33,50 @@ namespace top1::modules {
   }
 
   void SynthSampler::process(const audio::ProcessData& data) {
+    // Handle recording from audio input
+    if (isRecording) {
+      for (uint i = 0; i < data.nframes && recordPosition < maxSampleSize; ++i) {
+        recordBuffer[recordPosition++] = data.audio.input[i];
+      }
+      // Auto-stop if buffer is full
+      if (recordPosition >= maxSampleSize) {
+        stopRecording();
+      }
+    }
+
+    // Current played key for pitch calculation (stored per note-on)
+    static int currentPlayedKey = 60;
+    float pitchRatio = 1.0f;
+
     for (auto &&nEvent : data.midi) {
       nEvent.match([&] (midi::NoteOnEvent& e) {
           if (e.channel == 0) {
+            // If recording is armed, start recording with this key as root
+            if (recordArmed) {
+              startRecording(e.key);
+              return;
+            }
+            // Otherwise, play the sample
+            currentPlayedKey = e.key;
             props.playProgress = (props.fwd()) ? 0 : props.length() - 1;
             props.trigger = true;
           }
         }, [] (auto) {});
     }
 
-    float playSpeed = props.speed * sampleSpeed;
+    // Calculate pitch ratio: 2^((playedKey - rootKey) / 12)
+    pitchRatio = std::pow(2.0f, (currentPlayedKey - props.rootKey.get()) / 12.0f);
+    float playSpeed = props.speed * sampleSpeed * pitchRatio;
 
-    // Process audio
-    if (props.playProgress >= 0 && playSpeed > 0) {
+    // Process audio playback
+    if (props.playProgress >= 0 && playSpeed > 0 && !isRecording) {
       if (props.fwd()) {
         if (props.loop() && props.trigger) {
-          for(int i = 0; i < data.nframes; ++i) {
-            data.audio.proc[i] += sampleData[props.in + props.playProgress];
+          for(uint i = 0; i < data.nframes; ++i) {
+            int idx = props.in + static_cast<int>(props.playProgress);
+            if (idx >= 0 && idx < static_cast<int>(sampleData.size())) {
+              data.audio.proc[i] += sampleData[idx];
+            }
             props.playProgress += playSpeed;
             if (props.playProgress >= props.length()) {
               props.playProgress = 0;
@@ -57,7 +85,10 @@ namespace top1::modules {
         } else {
           int frms = std::min<int>(data.nframes, props.length() - props.playProgress);
           for(int i = 0; i < frms; ++i) {
-            data.audio.proc[i] += sampleData[props.in + props.playProgress];
+            int idx = props.in + static_cast<int>(props.playProgress);
+            if (idx >= 0 && idx < static_cast<int>(sampleData.size())) {
+              data.audio.proc[i] += sampleData[idx];
+            }
             props.playProgress += playSpeed;
           }
           if (props.playProgress >= props.length()) {
@@ -66,17 +97,23 @@ namespace top1::modules {
         }
       } else {
         if (props.loop() && props.trigger) {
-          for(int i = 0; i < data.nframes; ++i) {
-            data.audio.proc[i] += sampleData[props.in + props.playProgress];
+          for(uint i = 0; i < data.nframes; ++i) {
+            int idx = props.in + static_cast<int>(props.playProgress);
+            if (idx >= 0 && idx < static_cast<int>(sampleData.size())) {
+              data.audio.proc[i] += sampleData[idx];
+            }
             props.playProgress -= playSpeed;
             if (props.playProgress < 0) {
-              props.playProgress = props.length() -1;
+              props.playProgress = props.length() - 1;
             }
           }
         } else {
-          int frms = std::min<int>(data.nframes, props.playProgress);
+          int frms = std::min<int>(data.nframes, static_cast<int>(props.playProgress));
           for(int i = 0; i < frms; ++i) {
-            data.audio.proc[i] += sampleData[props.in + props.playProgress];
+            int idx = props.in + static_cast<int>(props.playProgress);
+            if (idx >= 0 && idx < static_cast<int>(sampleData.size())) {
+              data.audio.proc[i] += sampleData[idx];
+            }
             props.playProgress -= playSpeed;
           }
         }
@@ -86,6 +123,11 @@ namespace top1::modules {
     for (auto &&nEvent : data.midi) {
       nEvent.match([&] (midi::NoteOffEvent& e) {
           if (e.channel == 0) {
+            // Stop recording on key release
+            if (isRecording) {
+              stopRecording();
+              return;
+            }
             props.trigger = false;
             if (props.stop()) {
               props.playProgress = -1;
@@ -144,6 +186,70 @@ namespace top1::modules {
   void SynthSampler::init() {
     load();
   }
+
+  void SynthSampler::armRecording() {
+    recordArmed = true;
+    isRecording = false;
+    recordPosition = 0;
+    LOGI << "Recording armed - press a key to start recording";
+  }
+
+  void SynthSampler::startRecording(int midiKey) {
+    if (!recordArmed) return;
+    
+    recordArmed = false;
+    isRecording = true;
+    recordPosition = 0;
+    props.rootKey = midiKey;  // Store the key pressed as root key
+    recordBuffer.resize(maxSampleSize);
+    LOGI << "Recording started at root key: " << noteName(midiKey);
+  }
+
+  void SynthSampler::stopRecording() {
+    if (!isRecording) return;
+    
+    isRecording = false;
+    
+    // Copy recorded data to sample data
+    sampleData.resize(recordPosition);
+    for (size_t i = 0; i < recordPosition; ++i) {
+      sampleData[i] = recordBuffer[i];
+    }
+    
+    // Update sample rate to current rate
+    sampleSampleRate = Globals::samplerate;
+    sampleSpeed = 1.0f;
+    
+    // Reset in/out points
+    props.in.mode.max = recordPosition;
+    props.out.mode.max = recordPosition;
+    props.in = 0;
+    props.out = recordPosition;
+    
+    // Rebuild waveforms
+    auto &mwf = editScreen->mainWF;
+    mwf->clear();
+    for (size_t i = 0; i < sampleData.size(); ++i) {
+      mwf->addFrame(sampleData[i]);
+    }
+
+    auto &wf = editScreen->topWF;
+    wf->clear();
+    for (size_t i = 0; i < sampleData.size(); ++i) {
+      wf->addFrame(sampleData[i]);
+    }
+    editScreen->topWFW.viewRange = {0, wf->size() > 0 ? wf->size() - 1 : 0};
+    
+    LOGI << "Recording stopped. Captured " << recordPosition << " samples at root key: " << noteName(props.rootKey);
+  }
+
+  std::string SynthSampler::noteName(int midiNote) {
+    static const char* noteNames[] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+    int octave = (midiNote / 12) - 1;
+    int note = midiNote % 12;
+    return std::string(noteNames[note]) + std::to_string(octave);
+  }
+
 } // top1::module
 
 namespace top1::ui::drawing {
@@ -172,7 +278,22 @@ namespace top1::modules {
   /* SampleEditScreen                     */
   /****************************************/
 
-  bool SynthSampleScreen::keypress(ui::Key key) { return false; }
+  bool SynthSampleScreen::keypress(ui::Key key) {
+    switch (key) {
+    case ui::K_REC:
+      // Toggle recording armed state
+      if (module->isRecording) {
+        module->stopRecording();
+      } else if (module->recordArmed) {
+        module->recordArmed = false;  // Cancel arming
+      } else {
+        module->armRecording();
+      }
+      return true;
+    default:
+      return false;
+    }
+  }
 
   void SynthSampleScreen::rotary(ui::RotaryEvent e) {
     switch (e.rotary) {
@@ -243,17 +364,71 @@ namespace top1::modules {
     ctx.textAlign(TextAlign::Left, TextAlign::Baseline);
     ctx.fillText(fmt::format("×{:.2F}", props.speed.get()), pitchPos);
 
+    // Show root key and pitch offset info
+    ctx.textAlign(TextAlign::Left, TextAlign::Baseline);
+    ctx.fillStyle(Colours::Blue);
+    ctx.fillText(SynthSampler::noteName(props.rootKey), {pitchPos.x, pitchPos.y + 18});
+
+    // Show recording state
+    if (module->isRecording) {
+      ctx.fillStyle(Colours::Red);
+      ctx.font(Fonts::Bold);
+      ctx.font(18);
+      ctx.textAlign(TextAlign::Right, TextAlign::Baseline);
+      ctx.fillText("● REC", {300, 18});
+    } else if (module->recordArmed) {
+      ctx.fillStyle(Colours::Red);
+      ctx.font(Fonts::Norm);
+      ctx.font(14);
+      ctx.textAlign(TextAlign::Right, TextAlign::Baseline);
+      ctx.fillText("○ ARMED", {300, 18});
+    }
+
     ctx.callAt(
       mainWFpos, [&] () {
 
+        // Draw dimmed waveform for entire sample first (out-of-range sections)
+        if (mainWF->size() > 0) {
+          mainWFW.viewRange = {0, mainWF->size() - 1};
+          mainWFW.lineCol = Colours::TopWF.dim(0.5);  // Dimmed for out-of-range
+          mainWFW.minPx = 5;
+          mainWFW.draw(ctx);
+        }
+
+        // Draw active range on top with brighter color
         mainWFW.lineCol = colourCurrent;
-        mainWFW.minPx = 5;
         mainWFW.viewRange = {
           std::size_t(std::round(props.in / mainWF->ratio)),
           std::size_t(std::round(props.out / mainWF->ratio))};
+        if (mainWFW.viewRange.in < mainWFW.viewRange.out) {
+          mainWFW.drawRange(ctx, mainWFW.viewRange, colourCurrent);
+        }
 
-        mainWFW.draw(ctx);
+        // Draw playhead
+        if (props.playProgress >= 0 && !module->isRecording) {
+          float playPos = (props.in + props.playProgress) / mainWF->ratio;
+          float xPos = (playPos - mainWFW.viewRange.in) / float(mainWFW.viewRange.size()) * mainWFsize.w;
+          ctx.beginPath();
+          ctx.strokeStyle(Colours::White);
+          ctx.lineWidth(2);
+          ctx.moveTo(xPos, 0);
+          ctx.lineTo(xPos, mainWFsize.h);
+          ctx.stroke();
+        }
 
+        // Draw recording progress indicator
+        if (module->isRecording && module->recordPosition > 0) {
+          float recPos = module->recordPosition / mainWF->ratio;
+          float xPos = recPos / float(mainWF->size()) * mainWFsize.w;
+          ctx.beginPath();
+          ctx.strokeStyle(Colours::Red);
+          ctx.lineWidth(2);
+          ctx.moveTo(xPos, 0);
+          ctx.lineTo(xPos, mainWFsize.h);
+          ctx.stroke();
+        }
+
+        // In point marker (Blue)
         ctx.beginPath();
         ctx.circle(mainWFW.point(mainWFW.viewRange.in), 2);
         ctx.fill(Colours::Blue);
@@ -262,6 +437,7 @@ namespace top1::modules {
         ctx.circle(mainWFW.point(mainWFW.viewRange.in), 5);
         ctx.stroke(Colours::Blue);
 
+        // Out point marker (Green)
         ctx.beginPath();
         ctx.circle(mainWFW.point(mainWFW.viewRange.out), 2);
         ctx.fill(Colours::Green);

@@ -56,6 +56,8 @@ namespace top1::ui {
     K_METRONOME,
     K_SYNTH,
     K_DRUMS,
+    K_EFFECT,
+    K_SEQUENCER,
     K_SAMPLER,
     K_LOOPER,
 

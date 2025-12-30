@@ -2,6 +2,7 @@
 #include "core/ui/drawing.hpp"
 #include "core/globals.hpp"
 #include "util/timer.hpp"
+#include <gsl/span>
 
 namespace top1::modules {
 
@@ -24,6 +25,28 @@ namespace top1::modules {
     auto &trackBuffer = Globals::tapedeck.trackBuffer;
     auto level = generate_sequence<4>([this] (int n) { return props.tracks[n].level.get(); });
     auto pan = generate_sequence<4>([this] (int n) { return props.tracks[n].pan.get(); });
+    
+    // Process per-track effects
+    // Each track effect processes audio in-place in the track buffer
+    for (uint t = 0; t < 4; t++) {
+      if (!props.tracks[t].muted && !props.tracks[t].effectBypassed) {
+        // Create temporary buffer for this track's audio
+        for (uint f = 0; f < data.nframes; f++) {
+          trackEffectBuffer[f] = trackBuffer[f][t];
+        }
+        // Create a span for the track effect processing
+        gsl::span<float> trackSpan(trackEffectBuffer.data(), data.nframes);
+        // Create ProcessData for track effect
+        audio::ProcessData trackData = data;
+        trackData.audio.proc = trackSpan;
+        Globals::trackEffects[t].process(trackData);
+        // Copy back to track buffer
+        for (uint f = 0; f < data.nframes; f++) {
+          trackBuffer[f][t] = trackEffectBuffer[f];
+        }
+      }
+    }
+    
     for (uint f = 0; f < data.nframes; f++) {
       float lMix = 0, rMix = 0;
       for (uint t = 0; t < 4 ; t++) {
@@ -57,18 +80,36 @@ namespace top1::modules {
 
   bool MixerScreen::keypress(ui::Key key) {
     using namespace ui;
+    bool shift = Globals::ui.keys[ui::K_SHIFT];
     switch (key) {
     case K_BLUE_CLICK:
-      module->props.tracks[0].muted.step();
+      if (shift) {
+        // Shift+click toggles track effect bypass
+        module->props.tracks[0].effectBypassed.step();
+      } else {
+        module->props.tracks[0].muted.step();
+      }
       return true;
     case K_GREEN_CLICK:
-      module->props.tracks[1].muted.step();
+      if (shift) {
+        module->props.tracks[1].effectBypassed.step();
+      } else {
+        module->props.tracks[1].muted.step();
+      }
       return true;
     case K_WHITE_CLICK:
-      module->props.tracks[2].muted.step();
+      if (shift) {
+        module->props.tracks[2].effectBypassed.step();
+      } else {
+        module->props.tracks[2].muted.step();
+      }
       return true;
     case K_RED_CLICK:
-      module->props.tracks[3].muted.step();
+      if (shift) {
+        module->props.tracks[3].effectBypassed.step();
+      } else {
+        module->props.tracks[3].muted.step();
+      }
       return true;
     default:
       return false;
@@ -204,6 +245,20 @@ namespace top1::modules {
       ctx.font(20);
       ctx.textAlign(TextAlign::Center, TextAlign::Middle);
       ctx.fillText("MUTE", 30, 162.5);
+
+      // #FX Indicator - shows track effect status
+      Colour fxCol = (module->props.tracks[track-1].effectBypassed) ? Colours::Gray60 : trackCol;
+      ctx.beginPath();
+      ctx.strokeStyle(fxCol);
+      ctx.lineWidth(2.000000);
+      ctx.rect(1, 180, 58, 20);
+      ctx.stroke();
+      
+      ctx.fillStyle(fxCol);
+      ctx.font(Fonts::Norm);
+      ctx.font(14);
+      ctx.textAlign(TextAlign::Center, TextAlign::Middle);
+      ctx.fillText("FX", 30, 190);
 
       ctx.restore();
     }

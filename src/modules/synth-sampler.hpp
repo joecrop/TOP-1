@@ -19,12 +19,18 @@ namespace top1::modules {
 
     size_t maxSampleSize = 0;
     top1::DynArray<float> sampleData;
+    top1::DynArray<float> recordBuffer;  // Buffer for recording
     int sampleSampleRate = 44100;
     float sampleSpeed = 1;
 
     std::unique_ptr<SynthSampleScreen> editScreen;
 
     static const uint nVoices = 24;
+
+    // Recording state
+    bool recordArmed = false;
+    bool isRecording = false;
+    size_t recordPosition = 0;
 
     struct Props : public Properties {
       Property<std::string> sampleName = {this, "sample name"};
@@ -37,6 +43,7 @@ namespace top1::modules {
       Property<int> out        = {this, "out",   0, { 0, -1, 100}};
       Property<float> speed    = {this, "speed", 1, { 0,  5, 0.01}};
       Property<int, wrap> mode = {this, "mode",  0, {-3,  2, 1}};
+      Property<int> rootKey    = {this, "rootKey", 60, {0, 127, 1}};  // MIDI note for original pitch (C4 default)
 
       bool fwd() const {return mode >= 0;}
       bool bwd() const {return !fwd();}
@@ -61,6 +68,14 @@ namespace top1::modules {
     void load();
 
     void init() override;
+
+    // Recording functions
+    void armRecording();
+    void startRecording(int midiKey);
+    void stopRecording();
+
+    // Helper to get note name from MIDI note number
+    static std::string noteName(int midiNote);
 
     static fs::path samplePath(std::string name);
   };

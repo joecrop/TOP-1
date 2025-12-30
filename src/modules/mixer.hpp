@@ -14,6 +14,7 @@ namespace top1::modules {
 
   class Mixer final : public modules::Module {
     std::unique_ptr<MixerScreen> screen;
+    std::array<float, 8192> trackEffectBuffer;  // Buffer for per-track effect processing
   public:
 
     struct Props : public Properties {
@@ -21,6 +22,7 @@ namespace top1::modules {
         Property<float> level = {this, "LEVEL", 0.5, mode::sized_step_mode<float>(0, 1, 0.01)};
         Property<float> pan = {this, "PAN", 0, mode::sized_step_mode<float>(-0.9, 0.9, 0.1)};
         Property<bool> muted = {this, "MUTE", false};
+        Property<bool> effectBypassed = {this, "FX_BYPASS", false};  // Per-track effect bypass
         using Properties::Properties;
       };
 

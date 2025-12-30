@@ -96,6 +96,18 @@ namespace top1::modules {
     tapeBuffer.exit();
   }
 
+  void Tapedeck::setSpeed(float speed) {
+    // Apply varispeed - affects playback rate
+    // Clamp to valid range
+    speed = std::max(0.25f, std::min(2.0f, speed));
+    
+    // If playing, update the play speed while maintaining direction
+    if (state.playing()) {
+      float direction = (state.playSpeed >= 0) ? 1.0f : -1.0f;
+      state.nextSpeed = direction * speed;
+    }
+  }
+
   void Tapedeck::display() {
     Globals::ui.display(*tapeScreen);
   }
@@ -383,10 +395,19 @@ namespace top1::modules {
   void TapeScreen::rotary(ui::RotaryEvent e) {
     switch (e.rotary) {
     case ui::Rotary::Blue:
+      // Varispeed control
+      module->props.speed.step(e.clicks);
+      module->setSpeed(module->props.speed);
       break;
     case ui::Rotary::Green:
+      // Could be used for scrub or other feature
       break;
     case ui::Rotary::White:
+      // Reset speed to 1.0
+      if (e.clicks != 0) {
+        module->props.speed = 1.0f;
+        module->setSpeed(1.0f);
+      }
       break;
     case ui::Rotary::Red:
       module->props.gain.step(e.clicks);

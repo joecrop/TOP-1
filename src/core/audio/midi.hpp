@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <string>
 
 #include "util/poly-ptr.hpp"
 
@@ -27,6 +28,20 @@ namespace top1::midi {
     int velocity = data[1];
 
     NoteOnEvent(const MidiEvent& event) : MidiEvent(event) {};
+    
+    // Constructor for programmatic creation (e.g., from sequencer)
+    NoteOnEvent(int note, int vel) {
+      type = NOTE_ON;
+      channel = 0;
+      eventData[0] = note;
+      eventData[1] = vel;
+      data = eventData;
+      time = 0;
+      key = note;
+      velocity = vel;
+    }
+  private:
+    byte eventData[2];  // Storage for programmatically created events
   };
 
   struct NoteOffEvent : public MidiEvent {
@@ -53,6 +68,15 @@ namespace top1::midi {
     for (int i = 0; i < 128; i++) {
       freqTable[i] = tuning * std::pow(2, float(i - 69)/float(12));
     }
+  }
+
+  // Get note name string from MIDI note number
+  inline std::string noteName(int midiNote) {
+    static const char* noteNames[] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+    if (midiNote < 0 || midiNote > 127) return "?";
+    int octave = (midiNote / 12) - 1;
+    int note = midiNote % 12;
+    return std::string(noteNames[note]) + std::to_string(octave);
   }
 
 }

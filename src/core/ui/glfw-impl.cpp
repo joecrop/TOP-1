@@ -76,10 +76,10 @@ namespace top1::ui {
     case GLFW_KEY_G:     if (mods & GLFW_MOD_CONTROL) return K_METRONOME; else break;
     case GLFW_KEY_H:     if (mods & GLFW_MOD_CONTROL) return K_SAMPLER; else break;
     case GLFW_KEY_J:     if (mods & GLFW_MOD_CONTROL) return K_DRUMS; else break;
+    case GLFW_KEY_I:     if (mods & GLFW_MOD_CONTROL) return K_EFFECT; else break;
+    case GLFW_KEY_O:     if (mods & GLFW_MOD_CONTROL) return K_SEQUENCER; else break;
 
     case GLFW_KEY_L:     return K_LOOP;
-    case GLFW_KEY_I:     return K_LOOP_IN;
-    case GLFW_KEY_O:     return K_LOOP_OUT;
 
     case GLFW_KEY_X:     return K_CUT;
     case GLFW_KEY_C:     if (mods & GLFW_MOD_CONTROL) return K_LIFT; else break;

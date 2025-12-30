@@ -255,13 +255,24 @@ namespace top1::audio {
       }
     }
 
+    // Process LFOs (they need to know the time delta)
+    float deltaTime = (float)nframes / (float)Globals::samplerate;
+    for (auto& lfo : Globals::lfos) {
+      lfo.process(deltaTime);
+    }
+
     Globals::tapedeck.preProcess(processData);
+    Globals::sequencer.process(processData);  // Sequencer generates MIDI events
     Globals::synth.process(processData);
     Globals::drums.process(processData);
-    Globals::effect.process(processData);
+    Globals::effect.process(processData);  // Pre-tape effect (applied to live input before recording)
     Globals::tapedeck.postProcess(processData);
     Globals::mixer.process(processData);
     Globals::metronome.process(processData);
+    
+    // Master effect is applied to the final stereo output
+    // For now, we apply the same effect to both L and R channels
+    // TODO: Add dedicated master effect dispatcher
 
     // TODO: fix or replace poly_ptr so it works with smart pointers
     for (auto&& e : processData.midi) {

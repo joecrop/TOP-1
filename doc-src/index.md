@@ -34,20 +34,22 @@ These are the keybindings currently emulating the hardware buttons:
 | F1          | Track 1             | F2                  | Track 2             |
 | F3          | Track 3             | F4                  | Track 4             |
 | Ctrl + T    | Tape                | Ctrl + Y            | Mixer               |
-| Ctrl + U    | Synth               | Ctrl + G            | Metronome           |
+| Ctrl + U    | Synth               | Ctrl + I            | Effect              |
+| Ctrl + O    | Sequencer           | Ctrl + G            | Metronome           |
 | I           | Go to Loop In       | Shift + I           | Set Loop In         |
 | O           | Go to Loop Out      | Shift + O           | Set Loop Out        |
 | L           | Toggle Looping      | Ctrl + X            | Cut Tape Selection  |
 | Ctrl + C    | Lift Tape Selection | Ctrl + V            | Drop Tape Selection |
 
 # Future Plans
- - [ ] Input selection screen - select external audio, internal audio, or the mixer output
- - [ ] Sequencers - A few basic ones are planned
- - [ ] Synthesizers - One or two simple synths
- - [ ] Effects - Filter, EQ, Delay, Bit crushing etc
- - [ ] Sampler - This is the big one!
- - [ ] Modulation - LFO mainly
-And from there its just modules, modules, modules
+ - [x] Input selection screen - select external audio, internal audio, or the mixer output
+ - [x] Sequencers - Pattern, Arpeggiator, and Endless (generative)
+ - [x] Synthesizers - 10 synth engines including FM, granular, and phase distortion
+ - [x] Effects - 9 effects including delay, reverb, compression, and tape wobble
+ - [x] Sampler - Drum and synth samplers implemented
+ - [x] Modulation - 2 LFOs with mod matrix routing
+ - [ ] Hardware integration - Raspberry Pi build
+ - [ ] More module presets and sounds
 
 # Installation
 The bellow details are outdated, take a look at `.travis.yml` to see a way to install it. I will update these instructions soon™

@@ -73,7 +73,10 @@ namespace top1::modules {
 
     struct Props : Properties {
       Property<float> gain = {this, "PROC_GAIN", 0.5, mode::sized_step_mode<float>(0, 1, 0.01)};
+      Property<float> speed = {this, "SPEED", 1.0, mode::sized_step_mode<float>(0.25, 2.0, 0.05)};  // Varispeed: 0.25x to 2x
     } props;
+
+    void setSpeed(float speed);  // Apply varispeed to playback
 
     audio::Graph procGraph;
 

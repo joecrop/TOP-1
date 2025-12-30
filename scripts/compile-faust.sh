@@ -1,16 +1,20 @@
 #!/bin/bash
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ARCH_FILE="${SCRIPT_DIR}/faust-template.h"
+
 function compile {
-    ARCH_DIR="./"
-    ARCH_FILE="faust-template.h"
     echo "Compiling $1"
     bn=$(basename $1)
     bn=${bn%.*}
     dir=$(dirname $1)
     classname=faust_${bn//-/_}
 
-    faust $1 -o "${dir}/${bn}.faust.h" -cn $classname -a $ARCH_DIR$ARCH_FILE
+    faust $1 -o "${dir}/${bn}.faust.h" -cn $classname -a $ARCH_FILE
 }
+
+export -f compile
+export ARCH_FILE
 
 export -f compile
 

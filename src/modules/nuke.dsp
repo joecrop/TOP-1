@@ -16,7 +16,7 @@ gate = button("/TRIGGER");
 velocity = hslider("/VELOCITY", 1, 0, 1, 0.01);
 key = hslider("/KEY", 69, 0, 127, 0.1);
 
-filter = hslider("/FILTER", 1, 10, 15000, 10);
+filter = hslider("/FILTER", 15000, 10, 15000, 10);
 detune = hslider("/DETUNE", 0, 0, 1, 0.01);
 voices = hslider("/VOICES", 1, 1, 4, 0.01);
 
