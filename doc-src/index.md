@@ -98,7 +98,8 @@ apt install jackd\
 I recommend also installing `patchage` and `jack-keyboard`, but they are in no way required.
 
 With this set up, you can build & run the TOP-1 with
-```
+
+```bash
 cmake .
 make -j4
 bin/tapedeck
@@ -110,6 +111,7 @@ It should be possible to get the TOP-1 running on Windows/Mac too, but for now y
 ## Manual Faust
 If you change the `.dsp` files, you will need faust to compile them.
 It is very important that you use the correct version, which currently is `0.9.104`. To install that, run the following commands:
+
 ```bash
 git clone https://github.com/grame-cncm/faust
 cd faust
@@ -117,7 +119,9 @@ git checkout 24db8d98e63aa8a119ffc601bf6aeec3e33e7a86
 make
 sudo make install
 ```
+
 Once you have faust installed, verify that the `faust` command uses the correct version. You should see something like this:
+
 ```bash
 $ faust --version
 FAUST, DSP to C++ compiler, Version 0.9.104
@@ -125,9 +129,11 @@ Copyright (C) 2002-2017, GRAME - Centre National de Creation Musicale. All right
 ```
 
 Then, make the apropriate changes in the `.dsp` files, and compile them by running
-```
+
+```bash
 sh compile-faust.sh
 ```
+
 faust especially is a lot easier to use with the docker image, even if you are running everything else outside it.
 
 # Getting Involved

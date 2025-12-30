@@ -70,7 +70,10 @@ namespace top1::ui {
     case GLFW_KEY_9:     return K_9;
     case GLFW_KEY_0:     return K_0;
 
-    case GLFW_KEY_T:     if (mods & GLFW_MOD_CONTROL) return K_TAPE; else break;
+    case GLFW_KEY_T:     
+      if ((mods & GLFW_MOD_CONTROL) && (mods & GLFW_MOD_SHIFT)) return K_INPUT_SELECT;
+      else if (mods & GLFW_MOD_CONTROL) return K_TAPE;
+      else break;
     case GLFW_KEY_Y:     if (mods & GLFW_MOD_CONTROL) return K_MIXER; else break;
     case GLFW_KEY_U:     if (mods & GLFW_MOD_CONTROL) return K_SYNTH; else break;
     case GLFW_KEY_G:     if (mods & GLFW_MOD_CONTROL) return K_METRONOME; else break;

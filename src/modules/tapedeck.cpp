@@ -335,6 +335,9 @@ namespace top1::modules {
   bool TapeScreen::keypress(ui::Key key) {
     bool shift = Globals::ui.keys[ui::K_SHIFT];
     switch (key) {
+    case ui::K_INPUT_SELECT:
+      Globals::inputSelector.nextSource();
+      return true;
     case ui::K_REC:
       module->state.startRecord();
       return true;
@@ -1128,7 +1131,7 @@ namespace top1::modules {
     ctx.beginPath();
     ctx.fillText(module->tapeBuffer.timeStr(), 160, 30);
 
-    // #rect4292
+    // #rect4292 - Track indicator box
     ctx.beginPath();
     ctx.globalAlpha(1.0);
     ctx.lineJoin(Canvas::LineJoin::ROUND);
@@ -1137,11 +1140,48 @@ namespace top1::modules {
     ctx.rect(15, 15, 30, 30);
     ctx.stroke();
 
-    // #text4294
+    // #text4294 - Track number
     ctx.fillStyle(style);
     ctx.font(36.0f);
     ctx.beginPath();
     ctx.fillText(module->state.track.str(), 30, 29);
+
+    // Input source indicator (top right corner)
+    {
+      // Color based on input source
+      Colour inputColor;
+      switch (Globals::inputSelector.source()) {
+        case modules::InputSelector::Source::INTERNAL:
+          inputColor = Colours::Green;  // Internal synth = green
+          break;
+        case modules::InputSelector::Source::EXTERNAL:
+          inputColor = Colours::Blue;   // External = blue
+          break;
+        case modules::InputSelector::Source::MIXER:
+          inputColor = Colours::White;  // Mixer = white
+          break;
+      }
+
+      // Box for input indicator
+      ctx.beginPath();
+      ctx.globalAlpha(1.0);
+      ctx.lineJoin(Canvas::LineJoin::ROUND);
+      ctx.strokeStyle(inputColor);
+      ctx.lineWidth(1.5);
+      ctx.rect(275, 15, 30, 30);
+      ctx.stroke();
+
+      // Input source label
+      TextStyle inputStyle;
+      inputStyle.size = 14;
+      inputStyle.face = Fonts::Norm.face;
+      inputStyle.color = inputColor;
+      inputStyle.hAlign = HorizontalAlign::Center;
+      inputStyle.vAlign = VerticalAlign::Middle;
+      ctx.fillStyle(inputStyle);
+      ctx.beginPath();
+      ctx.fillText(Globals::inputSelector.sourceName(), 290, 29);
+    }
 
   }
 

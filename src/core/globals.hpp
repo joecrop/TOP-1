@@ -18,6 +18,7 @@
 #include "modules/mixer.hpp"
 #include "modules/metronome.hpp"
 #include "modules/lfo.hpp"
+#include "modules/input-selector.hpp"
 
 
 namespace top1 {
@@ -54,6 +55,7 @@ namespace top1 {
     static inline modules::Tapedeck tapedeck;
     static inline modules::Mixer mixer;
     static inline modules::Metronome metronome;
+    static inline modules::InputSelector inputSelector;  // Audio input source selector
 
     static inline void init() {
       dataFile.path = data_dir / "modules.json";

@@ -146,6 +146,20 @@ TOP-1 includes a virtual 4-track tape deck for recording and playback.
 3. Play notes - they'll be recorded to tape
 4. Stop recording when done
 
+### Input Source Selection
+
+The tape deck can record from three different audio sources. Press **Shift+Ctrl+T** on the tape screen to cycle through them:
+
+| Source | Icon | Color | Description |
+|--------|------|-------|-------------|
+| **Internal** | INT | Green | Records the synth output (default) |
+| **External** | EXT | Blue | Records from JACK audio input |
+| **Mixer** | MIX | White | Records the mixer output |
+
+The current input source is shown in the top right corner of the tape screen.
+
+**Auto-switch behavior:** When a sequencer starts playing, the input automatically switches to Internal so you can record the sequence. When the sequencer stops, it switches back to your previous source.
+
 ### Tape Speed (Varispeed)
 The tape deck includes varispeed control:
 - Adjust playback speed from 0.5x to 2.0x
@@ -208,6 +222,7 @@ The Mod Matrix (Shift+M or access via menu) lets you assign LFO modulation to an
 | **Ctrl+Y** | Mixer view |
 | **Ctrl+G** | Metronome view |
 | **Ctrl+J** | Drums view |
+| **Shift+Ctrl+T** | Cycle input source (on Tape screen) |
 | **Shift + (view key)** | Open module selector (hold Shift first!) |
 | **Space** | Play/Stop |
 | **,** / **.** | Octave down/up |

@@ -68,6 +68,8 @@ namespace top1::ui {
     K_LIFT,
     K_DROP,
     K_CUT,
+    
+    K_INPUT_SELECT,  // Shift+Ctrl+T to cycle input source
   };
 
   using PressedKeys = bool[256];

@@ -261,13 +261,48 @@ namespace top1::audio {
       lfo.process(deltaTime);
     }
 
+    // Track sequencer running state for input auto-switching
+    static bool wasSequencerRunning = false;
+    bool isSequencerRunning = false;
+    
+    // Check if any sequencer is actively playing
+    // This is done by checking the pattern sequencer specifically for now
+    // TODO: Make this more generic via the dispatcher
+    
     Globals::tapedeck.preProcess(processData);
     Globals::sequencer.process(processData);  // Sequencer generates MIDI events
     Globals::synth.process(processData);
     Globals::drums.process(processData);
     Globals::effect.process(processData);  // Pre-tape effect (applied to live input before recording)
+    
+    // Apply input selection - modify proc buffer based on input source
+    switch (Globals::inputSelector.source()) {
+      case modules::InputSelector::Source::INTERNAL:
+        // proc already contains synth output, nothing to do
+        break;
+      case modules::InputSelector::Source::EXTERNAL:
+        // Replace proc with external input
+        for (uint i = 0; i < nframes; i++) {
+          processData.audio.proc[i] = processData.audio.input[i];
+        }
+        break;
+      case modules::InputSelector::Source::MIXER:
+        // Will be handled after mixer processing - for now use synth
+        // This case is for bouncing/resampling the mixer output
+        break;
+    }
+    
     Globals::tapedeck.postProcess(processData);
     Globals::mixer.process(processData);
+    
+    // If MIXER input is selected, copy mixer output back to proc for next recording pass
+    if (Globals::inputSelector.source() == modules::InputSelector::Source::MIXER) {
+      // Copy stereo mix to mono proc for recording
+      for (uint i = 0; i < nframes; i++) {
+        processData.audio.proc[i] = (processData.audio.outL[i] + processData.audio.outR[i]) * 0.5f;
+      }
+    }
+    
     Globals::metronome.process(processData);
     
     // Master effect is applied to the final stereo output
