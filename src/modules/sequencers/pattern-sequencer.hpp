@@ -20,8 +20,9 @@ namespace top1::modules {
     static constexpr int NUM_NOTES = 16;  // 16 notes/drums can be triggered per step
 
     struct Step {
-      bool active[NUM_NOTES] = {false};  // Which notes are active on this step
+      bool active[NUM_NOTES] = {false};  // Which notes START on this step
       int velocity[NUM_NOTES] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};  // Velocity per note
+      int length[NUM_NOTES] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};  // Note length in steps (1 = single step)
     };
 
     struct Props : public Properties {
@@ -61,6 +62,17 @@ namespace top1::modules {
     // Metronome sync
     int lastBeat = -1;
     float accumulator = 0.0f;  // For sub-beat timing
+    
+    // Recording state - track held notes for variable length recording
+    struct HeldNote {
+      bool held = false;
+      int startStep = 0;
+      int slot = -1;
+    };
+    HeldNote heldNotes[NUM_NOTES];  // Track which notes are currently held
+    
+    // Playback state - track which notes are currently ringing
+    int ringingNotes[NUM_NOTES] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};  // -1 = not ringing, else = remaining steps
 
   private:
     std::unique_ptr<PatternSeqScreen> screen;

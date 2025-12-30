@@ -63,7 +63,10 @@ namespace top1 {
   }
 
   void ByteFile::create_file() {
-    close();
+    // Close the fstream without calling write_file() (which would fail on empty file)
+    if (fstream.is_open()) {
+      fstream.close();
+    }
     fstream.open(path, std::ios::trunc | std::ios::out | std::ios::binary);
     fstream.close();
     fstream.open(path, std::ios::in | std::ios::out | std::ios::binary);
@@ -93,8 +96,16 @@ namespace top1 {
 
   ByteFile::Position ByteFile::position() {
     if (!is_open()) throw Error(Error::Type::FileNotOpen, "ByteFile::position()");
-    LOGD << fstream.tellg();
-    auto r = fstream.seekp(fstream.tellg()).tellp();
+    auto pos = fstream.tellg();
+    LOGD << pos;
+    if (pos < 0) {
+      // Stream is in a bad state, try to recover
+      fstream.clear();
+      fstream.seekg(0, std::ios::beg);
+      fstream.seekp(0, std::ios::beg);
+      return 0;
+    }
+    auto r = fstream.seekp(pos).tellp();
     if (fstream.eof()) {
       fstream.clear();
       throw Error(Error::Type::PastEnd);

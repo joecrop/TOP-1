@@ -22,7 +22,7 @@ namespace top1 {
       enum class Type {
         WAVE,
         AIFF,
-      } type;
+      } type = Type::WAVE;  // Default to WAVE format
 
       int channels = 1;
       int samplerate = 44100;
@@ -81,7 +81,7 @@ namespace top1 {
     friend struct WAVE_fmt;
     friend struct WAVE_data;
 
-    ByteFile::Position audioOffset;
+    ByteFile::Position audioOffset = 0;
 
     Sample bytes_to_sample(bytes<sample_size> bytes) {
       return bytes.cast<Sample>();

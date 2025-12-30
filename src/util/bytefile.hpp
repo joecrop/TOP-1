@@ -115,12 +115,13 @@ namespace top1 {
       static std::string enumString(Type t) {
         switch(t) {
         case Type::FileNotOpen:
-          return "File not open"; break;
+          return "File not open";
         case Type::ExceptionThrown:
-          return "Exception thrown"; break;
+          return "Exception thrown";
         case Type::PastEnd:
-          return "Past the end of the file"; break;
+          return "Past the end of the file";
         }
+        return "Unknown error";
       }
 
       const char* what() const noexcept override {

@@ -113,6 +113,8 @@ namespace top1 {
     } else if (header.id == "FORM" && header.format == "AIFF") {
       info.type = Info::Type::AIFF;
     } else if (header.id.as_u() == 0) {
+      // New empty file - default to WAVE format
+      info.type = Info::Type::WAVE;
       create_file();
     } else {
       throw Error::UnrecognizedFileType;
@@ -151,25 +153,45 @@ namespace top1 {
 
   void SoundFile::write_file() {
     ByteFile::seek(0);
-    Header header;
 
     switch (info.type) {
     case Info::Type::WAVE:
-      LOGD << "Writing Wave file: ";
-      LOGD << path.c_str();
-      LOGD << "-------------------";
-
-      header.id = "RIFF";
-      header.format = "WAVE";
-      header.chunks.push_back(std::make_unique<WAVE_fmt>());
-      add_custom_chunks(header.chunks);
-      header.chunks.push_back(std::make_unique<WAVE_data>());
-      header.chunks.back()->size = ByteFile::size() - audioOffset;
-      header.write(*this);
-
-      LOGD << "Wrote " << header.chunks.size() << " chunks";
-      LOGE_IF(!fstream.good()) << "fstream errored";
-      LOGD << "-------------------";
+      {
+        // Write RIFF header directly to avoid virtual call issues
+        bytes<4> riff_id = "RIFF";
+        bytes<4> riff_size = {0,0,0,0}; // placeholder, will update
+        bytes<4> wave_format = "WAVE";
+        
+        auto riff_offset = ByteFile::position();
+        write_bytes(riff_id);
+        write_bytes(riff_size);
+        write_bytes(wave_format);
+        
+        // Write fmt chunk
+        WAVE_fmt fmt_chunk;
+        fmt_chunk.write(*this);
+        
+        // Write custom chunks
+        std::vector<std::unique_ptr<Chunk>> custom_chunks;
+        add_custom_chunks(custom_chunks);
+        for (auto&& c : custom_chunks) {
+          c->write(*this);
+        }
+        
+        // Write data chunk
+        WAVE_data data_chunk;
+        data_chunk.size = ByteFile::size() - audioOffset;
+        data_chunk.write(*this);
+        
+        // Update RIFF size
+        auto end_pos = ByteFile::position();
+        riff_size.as_u() = end_pos - riff_offset - 8;
+        ByteFile::seek(riff_offset + 4);
+        write_bytes(riff_size);
+        ByteFile::seek(end_pos);
+        
+        LOGE_IF(!fstream.good()) << "fstream errored";
+      }
       break;
     case Info::Type::AIFF:
       throw "Unsupported type. Currently only wav is supported";

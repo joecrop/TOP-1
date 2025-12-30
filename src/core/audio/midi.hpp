@@ -43,10 +43,22 @@ namespace top1::midi {
   };
 
   struct NoteOffEvent : public MidiEvent {
-    int key = data[0];
-    int velocity = data[1];
+    int key;
+    int velocity;
 
-    NoteOffEvent(const MidiEvent& event) : MidiEvent(event) {};
+    NoteOffEvent(const MidiEvent& event) : MidiEvent(event), key(data[0]), velocity(data[1]) {};
+    
+    // Constructor for programmatic creation (e.g., from sequencer)
+    NoteOffEvent(int note, int vel = 0) : key(note), velocity(vel) {
+      type = NOTE_OFF;
+      channel = 0;
+      eventData[0] = note;
+      eventData[1] = vel;
+      data = eventData;
+      time = 0;
+    }
+  private:
+    byte eventData[2];  // Storage for programmatically created events
   };
 
   struct ControlChangeEvent : public MidiEvent {

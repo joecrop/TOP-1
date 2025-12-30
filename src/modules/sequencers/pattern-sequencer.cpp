@@ -22,7 +22,13 @@ namespace top1::modules {
       for (int i = 0; i < NUM_NOTES; i++) {
         step.active[i] = false;
         step.velocity[i] = 100;
+        step.length[i] = 1;
       }
+    }
+    // Also reset held and ringing note state
+    for (int i = 0; i < NUM_NOTES; i++) {
+      heldNotes[i].held = false;
+      ringingNotes[i] = -1;
     }
   }
 
@@ -83,6 +89,7 @@ namespace top1::modules {
   void PatternSequencer::process(const audio::ProcessData& data) {
     // Get the current edit step (either cursor when stopped, or playhead when playing)
     int editStep = props.running.get() ? props.currentStep.get() : cursorStep;
+    int patternLen = props.patternLength.get();
     
     // Process incoming MIDI to record notes into the pattern
     for (auto& ev : data.midi) {
@@ -91,17 +98,72 @@ namespace top1::modules {
           if (e.velocity > 0) {
             int slot = getSlotForNote(e.key);
             if (slot >= 0 && slot < NUM_NOTES) {
-              // Toggle the note at current edit position
+              // Start recording this note
               pattern[editStep].active[slot] = true;
               pattern[editStep].velocity[slot] = e.velocity;
+              pattern[editStep].length[slot] = 1;  // Start with length 1
+              
+              // Track that this note is being held (for extending length)
+              heldNotes[slot].held = true;
+              heldNotes[slot].startStep = editStep;
+              heldNotes[slot].slot = slot;
             }
+          }
+        },
+        [&](midi::NoteOffEvent& e) {
+          int slot = getSlotForNote(e.key);
+          if (slot >= 0 && slot < NUM_NOTES && heldNotes[slot].held) {
+            // Note released - calculate final length
+            int startStep = heldNotes[slot].startStep;
+            int length = 1;
+            if (props.running.get()) {
+              // Calculate how many steps the note was held
+              int currentStep = props.currentStep.get();
+              if (currentStep >= startStep) {
+                length = currentStep - startStep + 1;
+              } else {
+                // Wrapped around pattern
+                length = (patternLen - startStep) + currentStep + 1;
+              }
+              // Clamp length to pattern length
+              if (length > patternLen) length = patternLen;
+            }
+            pattern[startStep].length[slot] = length;
+            heldNotes[slot].held = false;
           }
         },
         [](auto&&) {}
       );
     }
     
+    // If running, extend held notes as we advance
+    if (props.running.get()) {
+      for (int n = 0; n < NUM_NOTES; n++) {
+        if (heldNotes[n].held) {
+          int startStep = heldNotes[n].startStep;
+          int currentStep = props.currentStep.get();
+          int length;
+          if (currentStep >= startStep) {
+            length = currentStep - startStep + 1;
+          } else {
+            length = (patternLen - startStep) + currentStep + 1;
+          }
+          if (length <= patternLen) {
+            pattern[startStep].length[n] = length;
+          }
+        }
+      }
+    }
+    
     if (!props.running.get()) {
+      // When stopped, send note-offs for any ringing notes
+      for (int n = 0; n < NUM_NOTES; n++) {
+        if (ringingNotes[n] >= 0) {
+          int midiNote = getNoteForSlot(n);
+          data.midi.emplace_back(new midi::NoteOffEvent(midiNote));
+          ringingNotes[n] = -1;
+        }
+      }
       return;  // Not running - don't advance or trigger notes
     }
     
@@ -125,18 +187,40 @@ namespace top1::modules {
       accumulator -= samplesPerStep;
       
       // Advance to next step
-      int nextStep = (currentStep + 1) % props.patternLength.get();
+      int nextStep = (currentStep + 1) % patternLen;
       props.currentStep = nextStep;
       
-      // Trigger notes for this step
+      // First, decrement ringing notes and send note-offs for expired ones
+      for (int n = 0; n < NUM_NOTES; n++) {
+        if (ringingNotes[n] > 0) {
+          ringingNotes[n]--;
+          if (ringingNotes[n] == 0) {
+            // Note has finished - send note-off
+            int midiNote = getNoteForSlot(n);
+            data.midi.emplace_back(new midi::NoteOffEvent(midiNote));
+            ringingNotes[n] = -1;
+          }
+        }
+      }
+      
+      // Trigger notes that START on this step
       Step& step = pattern[nextStep];
       for (int n = 0; n < NUM_NOTES; n++) {
         if (step.active[n]) {
           int midiNote = getNoteForSlot(n);
           int velocity = step.velocity[n];
+          int length = step.length[n];
+          
+          // If this note is already ringing, send note-off first
+          if (ringingNotes[n] >= 0) {
+            data.midi.emplace_back(new midi::NoteOffEvent(midiNote));
+          }
           
           // Create MIDI note-on event
           data.midi.emplace_back(new midi::NoteOnEvent(midiNote, velocity));
+          
+          // Track how long this note should ring
+          ringingNotes[n] = length;
         }
       }
     }
@@ -216,6 +300,7 @@ namespace top1::modules {
     ctx.stroke();
 
     // Draw grid cells (reversed - high notes on top)
+    // First pass: draw background cells and continuation markers
     for (int step = 0; step < PatternSequencer::NUM_STEPS; step++) {
       for (int note = 0; note < PatternSequencer::NUM_NOTES; note++) {
         int displayRow = PatternSequencer::NUM_NOTES - 1 - note;  // Reverse: slot 15 at top, slot 0 at bottom
@@ -225,31 +310,75 @@ namespace top1::modules {
         // Dim steps beyond pattern length
         bool inPattern = step < patternLength;
         bool isEditColumn = (step == editColumn);
-        bool isActive = module->pattern[step].active[note];
+        
+        // Check if this cell is a "continuation" of a previous note
+        bool isContinuation = false;
+        for (int prevStep = 0; prevStep < step; prevStep++) {
+          if (module->pattern[prevStep].active[note]) {
+            int noteLength = module->pattern[prevStep].length[note];
+            if (prevStep + noteLength > step) {
+              isContinuation = true;
+              break;
+            }
+          }
+        }
 
         ctx.beginPath();
         ctx.rect({x, y}, {cellW, cellH});
         
-        if (isActive) {
-          // Active step - colored based on note row (4 rows per color for 16 notes)
-          Colour stepCol;
-          if (note < 4) stepCol = Colours::Blue;
-          else if (note < 8) stepCol = Colours::Green;
-          else if (note < 12) stepCol = Colours::White;
-          else stepCol = Colours::Red;
-          
-          if (!inPattern) stepCol = stepCol.dim(0.3f);
-          if (isEditColumn) stepCol = stepCol.brighten(0.3f);
-          
-          ctx.fillStyle(stepCol);
-          ctx.fill();
+        // Inactive/continuation step background
+        Colour bgCol;
+        if (isContinuation) {
+          // Continuation cells get a dimmer version of green
+          bgCol = Colours::Green.dim(0.5f);
         } else {
-          // Inactive step
-          Colour bgCol = inPattern ? Colours::Gray70 : Colours::Gray70.dim(0.3f);
-          if (isEditColumn) bgCol = bgCol.brighten(0.15f);
-          ctx.fillStyle(bgCol);
-          ctx.fill();
+          bgCol = inPattern ? Colours::Gray70 : Colours::Gray70.dim(0.3f);
         }
+        if (!inPattern) bgCol = bgCol.dim(0.3f);
+        if (isEditColumn) bgCol = bgCol.brighten(0.15f);
+        ctx.fillStyle(bgCol);
+        ctx.fill();
+      }
+    }
+    
+    // Second pass: draw note START markers (bright, with length indicator)
+    for (int step = 0; step < PatternSequencer::NUM_STEPS; step++) {
+      for (int note = 0; note < PatternSequencer::NUM_NOTES; note++) {
+        if (!module->pattern[step].active[note]) continue;
+        
+        int displayRow = PatternSequencer::NUM_NOTES - 1 - note;
+        float x = gridX + step * (cellW + spacing);
+        float y = gridY + displayRow * (cellH + spacing);
+        int noteLength = module->pattern[step].length[note];
+        
+        bool inPattern = step < patternLength;
+        bool isEditColumn = (step == editColumn);
+        
+        // Calculate total width of note (spans multiple cells)
+        float totalWidth = noteLength * (cellW + spacing) - spacing;
+        // Clamp to not exceed grid
+        int maxLength = PatternSequencer::NUM_STEPS - step;
+        if (noteLength > maxLength) {
+          totalWidth = maxLength * (cellW + spacing) - spacing;
+        }
+        
+        // Active step - all notes are green
+        Colour stepCol = Colours::Green;
+        
+        if (!inPattern) stepCol = stepCol.dim(0.3f);
+        if (isEditColumn) stepCol = stepCol.brighten(0.3f);
+        
+        // Draw the full note bar
+        ctx.beginPath();
+        ctx.rect({x, y}, {totalWidth, cellH});
+        ctx.fillStyle(stepCol);
+        ctx.fill();
+        
+        // Draw a small marker at the start to indicate note-on position
+        ctx.beginPath();
+        ctx.rect({x, y}, {3, cellH});
+        ctx.fillStyle(stepCol.brighten(0.3f));
+        ctx.fill();
       }
     }
 
